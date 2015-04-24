@@ -1,0 +1,140 @@
+cur_frm.cscript.brand=function(doc,cdt,cdn)
+{
+	d=locals[cdt][cdn];
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.get_brand_name",
+		args:{brand:d.brand},
+		callback:function(r){
+			d.brand_name=r.message;
+			refresh_field("purchase_item");
+		}
+	});
+}
+cur_frm.cscript.cloth_type=function(doc,cdt,cdn)
+{
+	d=locals[cdt][cdn];
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.get_clothtype_name",
+		args:{cloth_type:d.cloth_type},
+		callback:function(r)
+		{
+			d.clothtype_name=r.message;
+			refresh_field("purchase_item");
+		}
+	});
+}
+cur_frm.cscript.category=function(doc,cdt,cdn)
+{
+	d=locals[cdt][cdn];
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.get_category_name",
+		args:{category:d.category},
+		callback:function(r){
+			d.category_name=r.message;
+			refresh_field("purchase_item");
+		}
+	});
+}
+cur_frm.cscript.color=function(doc,cdt,cdn)
+{
+	d=locals[cdt][cdn];
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.get_color_name",
+		args:{color:d.color},
+		callback:function(r){
+			d.color_name=r.message;
+			refresh_field("purchase_item");
+		}
+	});
+}
+/*cur_frm.cscript.size=function(doc,cdt,cdn)
+{
+	d=locals[cdt][cdn];
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.get_size_value",
+		args:{size:d.size},
+		callback:function(r){
+			d.size_value=r.message;
+			refresh_field("purchase_item");
+		}
+	});
+}*/
+cur_frm.cscript.price=function(doc,cdt,cdn)
+{
+	d=locals[cdt][cdn];
+	var amount=d.quantity*d.price;
+	d.amount=amount;
+	refresh_field("purchase_item");
+}
+cur_frm.cscript.date=function(doc,cdt,cdn)
+{
+	d=doc.purchase_item;
+	var len=d.length;
+	var tamount=0;
+	for(i=0;i<len;i++)
+	{
+		tamount=tamount+d[i].amount;
+	}
+	cur_frm.set_value("total_amount",tamount);
+}
+cur_frm.cscript.size=function(doc,cdt,cdn)
+{
+	var d=locals[cdt][cdn];
+	var b=d.barcode;
+	if(!b)
+	{
+		frappe.call({
+			method:"purchase1.purchase1.doctype.purchase.purchase.generate_barcode",
+			args:{size:d.size},
+			callback:function(r){
+				var doclist = frappe.model.sync(r.message);
+				d.barcode=doclist[0];
+				d.size_value=doclist[1];
+				refresh_field("purchase_item");
+			}
+		});
+	}
+	else
+	{
+		frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.get_size_value",
+		args:{size:d.size},
+		callback:function(r){
+			d.size_value=r.message;
+			refresh_field("purchase_item");
+		}
+	  });
+	}
+}
+cur_frm.cscript.saling_price=function(doc,cdt,cdn)
+{
+	var d=locals[cdt][cdn];
+	var b=d.barcode;
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.create_barcode",
+		args:{bar:b},
+		callback:function(r)
+		{
+			d.barcode_image=r.message;
+			refresh_field("purchase_item");
+		}
+	});
+}
+cur_frm.cscript.print_barcode=function(doc,cdt,cdn)
+{
+	var divToPrint=document.getElementById("printable");
+  	newWin= window.open("");
+  	newWin.document.write(divToPrint.outerHTML);
+  	newWin.print();
+  	newWin.close();
+}
+cur_frm.cscript.party=function(doc,cdt,cdn)
+{
+	frappe.call({
+		method:"purchase1.purchase1.doctype.purchase.purchase.rem_item_code",
+		args:{},
+		callback:function(r)
+		{
+		}
+	});
+}
